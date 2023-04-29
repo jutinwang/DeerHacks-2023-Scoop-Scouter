@@ -4,7 +4,7 @@ def truckDetector(image):
     classifier = cv2.CascadeClassifier('/Users/cielsealspheal/better-deerhack-scoop-scouter/DeerHacks-2023-Scoop-Scouter/app/truck_cv/haarcascade_truck.xml')
 
     # Convert the image to grayscale
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     # Detect vehicles in the image
     vehicles = classifier.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
