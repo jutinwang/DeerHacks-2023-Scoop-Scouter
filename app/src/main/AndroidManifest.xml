@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ScoopScouter"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDyiPuAh9gTZd98nwQdof9b2WoRZEwSfes"></meta-data>
         <activity
             android:name=".MainActivity"
             android:exported="true">
