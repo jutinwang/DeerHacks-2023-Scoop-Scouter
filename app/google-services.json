@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "302954806710",
+    "project_id": "mindful-torus-385205",
+    "storage_bucket": "mindful-torus-385205.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:302954806710:android:ff27cfbb0eb940f66b5517",
+        "android_client_info": {
+          "package_name": "com.uottawa.felipemodesto.scoopscouter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "302954806710-95rn25oga7pmdu2p3mamtck6i4fitu9b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0TyyUThhY-xk0fao3RDd6_RssRtoV1B4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "302954806710-95rn25oga7pmdu2p3mamtck6i4fitu9b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
