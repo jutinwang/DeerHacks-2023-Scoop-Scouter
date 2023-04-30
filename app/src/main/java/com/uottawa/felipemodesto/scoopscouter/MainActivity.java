@@ -32,6 +32,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.GeoPoint;
 
 import android.Manifest;
 import android.app.Activity;
@@ -79,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ImageButton takePicture;
     Button findTrucks;
     private LocationRequest locationRequest;
+    Button testButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         locationRequest.setFastestInterval(2000);
         takePicture = findViewById(R.id.reportSightingButton);
         findTrucks = findViewById(R.id.truckInArea);
+        testButton = findViewById(R.id.testbutton);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -117,6 +121,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 openCamera();
             }
         });
+
+        testButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CloudStorage cloud = new CloudStorage();
+                GeoPoint currentLocation = new GeoPoint(getLat(),getLon());
+                Date d = new Date();
+                Timestamp currentTime = new Timestamp(d);
+
+                cloud.AddData(currentTime,currentLocation);
+            }
+        });
     }
 
     //triggered to add contents to map
@@ -131,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 // Check the current zoom level of the map
                 float zoomLevel = googleMap.getCameraPosition().zoom;
                 // Set the visibility of the button based on the zoom level
-                if (zoomLevel > 15) {
+                if (zoomLevel < 15 || zoomLevel > 60) {
                     findTrucks.setVisibility(View.GONE);
                 } else {
                     findTrucks.setVisibility(View.VISIBLE);
