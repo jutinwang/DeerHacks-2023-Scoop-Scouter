@@ -59,6 +59,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
@@ -68,6 +69,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -79,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Button findTrucks;
     private LocationRequest locationRequest;
     Button testButton;
+    SearchView searchBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +100,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         takePicture = findViewById(R.id.reportSightingButton);
         findTrucks = findViewById(R.id.truckInArea);
         testButton = findViewById(R.id.testbutton);
+        searchBar = (SearchView) findViewById(R.id.searchForAddress);
+        searchBar.setSubmitButtonEnabled(true);
+        searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                getQuery();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -130,6 +148,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 cloud.AddData(currentTime,currentLocation);
             }
         });
+    }
+
+    public void getQuery(){
+        CharSequence query = searchBar.getQuery();
+        Log.e("Search Bar Message", "" + query);
     }
 
     //triggered to add contents to map
@@ -170,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //placing the marker for all avaliable trucks
         Marker tester = googleMap.addMarker(new MarkerOptions()
                         .position(schoolParkingLot)
-                        .title("Distance")
+                        .title("Distance:")
                         .snippet("" + round(results[0]) + "m." + " " + (round(results[0]) * 100)/4800 + "min to walk")
                 .icon(BitmapFromVector(getApplicationContext(), R.drawable.ice_cream_marker)));
 
@@ -187,7 +210,35 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    //method for placing markers all over the map.
+    private void placeMarkers (List<GeoPoint> geoList, @NonNull GoogleMap googleMap){
+        for (int x = 0; x < geoList.size(); x++){
+            float[] results = new float[1];
+
+            LatLng userLocation = new LatLng(getLat(), getLon());
+            LatLng newIceCreamTruck = new LatLng(geoList.get(x).getLatitude(), geoList.get(x).getLongitude());
+
+            Location.distanceBetween(userLocation.latitude, userLocation.longitude,
+                    newIceCreamTruck.latitude, newIceCreamTruck.longitude, results);
+            Marker newIceCreamTruckMarker = googleMap.addMarker(new MarkerOptions()
+                    .position(newIceCreamTruck)
+                    .title("Distance")
+                    .snippet("" + round(results[0]) + "m." + " " + (round(results[0]) * 100)/4800 + "min to walk")
+                    .icon(BitmapFromVector(getApplicationContext(), R.drawable.ice_cream_marker)));
+
+            new CountDownTimer(30000, 1000) {
+
+                public void onTick(long millisUntilFinished) {
+                }
+                public void onFinish() {
+                    newIceCreamTruckMarker.remove();
+                }
+            }.start();
+        }
+    }
+
     //https://www.geeksforgeeks.org/how-to-add-custom-marker-to-google-maps-in-android/
+    //converts vector to bitmap
     private BitmapDescriptor BitmapFromVector(Context context, int vectorResId) {
         // below line is use to generate a drawable.
         Drawable vectorDrawable = ContextCompat.getDrawable(
