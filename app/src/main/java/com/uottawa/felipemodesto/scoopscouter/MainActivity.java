@@ -70,6 +70,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -168,6 +169,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void getQuery(){
         CharSequence query = searchBar.getQuery();
+        String queryString = query.toString();
+
+        List<String> coordinates = Arrays.asList(queryString.split(","));
+
+        LatLng myLocation = new LatLng(Float.parseFloat(coordinates.get(0)), Float.parseFloat(coordinates.get(1)));
+
+        Marker tester = myGoogle.addMarker(new MarkerOptions()
+                .position(myLocation)
+                .title("You're Here Now!")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        myGoogle.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 10));
         Log.e("Search Bar Message", "" + query);
     }
 
