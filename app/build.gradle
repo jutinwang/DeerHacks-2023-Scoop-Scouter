@@ -1,7 +1,10 @@
 plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
+    id 'com.chaquo.python'
 }
+
+
 
 android {
     namespace 'com.uottawa.felipemodesto.scoopscouter'
@@ -14,6 +17,22 @@ android {
         versionCode 1
         versionName "1.0"
 
+
+
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+        }
+        python {
+            pip {
+                install "opencv-python"
+            }
+            version "3.10" // COULD BE A PROBLEM IN THE FUTURE ! ! ! ! ! ! ! ! ! ! !
+        }
+        sourceSets {
+            main {
+                python.srcDir "src/main/python"
+            }
+        }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -43,5 +62,5 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:17.0.1'
     implementation 'com.google.firebase:firebase-firestore:24.5.0'
     implementation 'com.google.firebase:firebase-core:21.1.1'
-    implementation 'com.koalap:geofirestore-android:1.2.2'
+    // implementation 'com.koalap:geofirestore-android:1.2.2'
 }

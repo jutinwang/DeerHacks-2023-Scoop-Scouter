@@ -9,6 +9,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
+import com.chaquo.python.PyObject;
+import com.chaquo.python.Python;
+import com.chaquo.python.android.AndroidPlatform;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.LocationCallback;
@@ -208,6 +211,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         startActivityForResult(cameraIntent, 100);
     }
 
+    // global variable for storing photo
+    Bitmap bitmapInputImage = null;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -217,26 +222,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 storageVolume = storageManager.getStorageVolumes().get(0);
             }
-            Bitmap bitmapInputImage = (Bitmap) data.getExtras().get("data");
+            bitmapInputImage = (Bitmap) data.getExtras().get("data");
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             bitmapInputImage.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-            byte[] bytesArray = byteArrayOutputStream.toByteArray();
-
-            File fileOutput = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                fileOutput = new File(storageVolume.getDirectory().getPath() + "/Download/output1.jpeg");
-            }
-            FileOutputStream fileOutputStream = null;
-            try {
-                fileOutputStream = new FileOutputStream(fileOutput);
-                fileOutputStream.write(bytesArray);
-                fileOutputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            // byte[] bytesArray = byteArrayOutputStream.toByteArray()
         }
     }
+
+// add to verification confirmation function
+//    Python.start(new AndroidPlatform(this));
+//    final Python py = Python.getInstance();
+//        PyObject pyo = py.getModule("ict_classification");
+//        PyObject get_is_truck = pyo.callAttr("main", bitmapInputImage);
+//        boolean is_truck = false;
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
