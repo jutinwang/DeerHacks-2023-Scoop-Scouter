@@ -54,7 +54,7 @@ public class CloudStorage extends AppCompatActivity {
         truckEntry.put("location", gp);
         truckEntry.put("timestamp", t);
 
-        db.collection("cities")
+        db.collection("ice_cream_trucks")
                 .add(truckEntry)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
