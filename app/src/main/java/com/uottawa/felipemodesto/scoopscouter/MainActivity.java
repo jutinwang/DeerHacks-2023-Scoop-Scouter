@@ -33,6 +33,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -40,6 +41,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Looper;
+import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -48,20 +51,19 @@ import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    LocationManager LocationManager1;
-    final static String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-    final static int PERMISSION_ALL = 1;
     Double[] locations = new Double[2];
 
     ImageButton takePicture;
-    String currentPhotoPath;
     private LocationRequest locationRequest;
 
     @Override
@@ -128,54 +130,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         startActivityForResult(cameraIntent, 100);
     }
 
-    //////////////////////////////////////////////////////////////////////////////////
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        currentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
-    private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-            }
-            // Continue only if the File was successfully created
-//            if (photoFile != null) {
-//                Uri photoURI = FileProvider.getUriForFile(this,
-//                        "com.example.android.fileprovider",
-//                        photoFile);
-//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-//                startActivityForResult(takePictureIntent, 101);
-//            }
-        }
-    }
-    //////////////////////////////////////////////////////////////////////////////////
-
-    //might remove soon
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == 100) {
-            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        if (resultCode == RESULT_OK) {
+            StorageManager storageManager = (StorageManager) getSystemService(STORAGE_SERVICE);
+            StorageVolume storageVolume = null; // internal Storage
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                storageVolume = storageManager.getStorageVolumes().get(0);
+            }
+            Bitmap bitmapInputImage = (Bitmap) data.getExtras().get("data");
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmapInputImage.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            byte[] bytesArray = byteArrayOutputStream.toByteArray();
+
+            File fileOutput = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                fileOutput = new File(storageVolume.getDirectory().getPath() + "/Download/output1.jpeg");
+            }
+            FileOutputStream fileOutputStream = null;
+            try {
+                fileOutputStream = new FileOutputStream(fileOutput);
+                fileOutputStream.write(bytesArray);
+                fileOutputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
