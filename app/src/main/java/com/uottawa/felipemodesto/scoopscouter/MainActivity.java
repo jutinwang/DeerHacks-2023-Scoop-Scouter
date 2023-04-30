@@ -75,6 +75,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    public static MainActivity instance;
     Double[] locations = new Double[2];
 
     ImageButton takePicture;
@@ -82,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LocationRequest locationRequest;
     Button testButton;
     SearchView searchBar;
+    GoogleMap myGoogle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.maps);
         mapFragment.getMapAsync(this);
+        instance = this;
 
         locations[0] = 43.550553331155974;
         locations[1] = -79.66621315112504;
@@ -155,11 +158,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.e("Search Bar Message", "" + query);
     }
 
+    public static MainActivity getInstance() {
+        return instance;
+    }
+
     //triggered to add contents to map
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         float[] results = new float[1];
-
+        myGoogle = googleMap;
         // Set up a listener for camera idle events
         googleMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
@@ -211,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //method for placing markers all over the map.
-    private void placeMarkers (List<GeoPoint> geoList, @NonNull GoogleMap googleMap){
+    public void placeMarkers (List<GeoPoint> geoList){
         for (int x = 0; x < geoList.size(); x++){
             float[] results = new float[1];
 
@@ -220,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             Location.distanceBetween(userLocation.latitude, userLocation.longitude,
                     newIceCreamTruck.latitude, newIceCreamTruck.longitude, results);
-            Marker newIceCreamTruckMarker = googleMap.addMarker(new MarkerOptions()
+            Marker newIceCreamTruckMarker = myGoogle.addMarker(new MarkerOptions()
                     .position(newIceCreamTruck)
                     .title("Distance")
                     .snippet("" + round(results[0]) + "m." + " " + (round(results[0]) * 100)/4800 + "min to walk")

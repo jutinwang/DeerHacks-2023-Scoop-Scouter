@@ -138,6 +138,7 @@ public class CloudStorage extends AppCompatActivity {
                         // matchingDocs contains the results
                         // ...
                         ////// CALL DISPLAY ALL MARKERS ////// ( can adapt to accept List<DocumentSnapshot>)
+                        MainActivity.getInstance().placeMarkers(markerPoints);
                     }
                 });
 
