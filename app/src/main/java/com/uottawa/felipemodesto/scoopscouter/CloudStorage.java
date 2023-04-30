@@ -103,11 +103,10 @@ public class CloudStorage extends AppCompatActivity {
         List<GeoQueryBounds> bounds = GeoFireUtils.getGeoHashQueryBounds(center, radiusInM);
         final List<Task<QuerySnapshot>> tasks = new ArrayList<>();
         for (GeoQueryBounds b : bounds) {
-            Query q = db.collection("cities")
+            Query q = db.collection("ice_cream_trucks")
                     .orderBy("geohash")
                     .startAt(b.startHash)
                     .endAt(b.endHash);
-            Log.d(TAG, "bound iteration");
             tasks.add(q.get());
         }
         List<GeoPoint> markerPoints = new ArrayList<>();
@@ -124,7 +123,6 @@ public class CloudStorage extends AppCompatActivity {
 //                                double lat = doc.getDouble("lat");
 //                                double lng = doc.getDouble("lng");
                                 GeoPoint gp = doc.getGeoPoint("location");
-                                Log.d(TAG, "succers");
 
                                 // We have to filter out a few false positives due to GeoHash
                                 // accuracy, but most will match
