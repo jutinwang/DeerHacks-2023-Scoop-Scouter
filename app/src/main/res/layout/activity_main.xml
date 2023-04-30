@@ -26,13 +26,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="580dp"
+        android:background="@color/logo_blue"
+        android:shadowColor="@color/logo_blue"
         android:text="@string/findTruck"
+        android:textColor="#FFFFFF"
+        android:textColorHighlight="@color/logo_blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchForAddress"
-        app:layout_constraintVertical_bias="0.196" />
+        app:layout_constraintVertical_bias="0.196"
+        app:rippleColor="@color/logo_blue"
+        tools:ignore="TextContrastCheck" />
 
     <SearchView
         android:id="@+id/searchForAddress"
@@ -63,7 +69,9 @@
         android:id="@+id/testbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"
+        android:background="@color/logo_blue"
+        android:text="@string/placeMarkerName"
+        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/reportSightingButton"
         app:layout_constraintHorizontal_bias="0.906"
