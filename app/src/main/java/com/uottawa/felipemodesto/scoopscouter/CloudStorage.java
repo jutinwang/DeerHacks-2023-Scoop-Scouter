@@ -51,15 +51,28 @@ public class CloudStorage extends AppCompatActivity {
             }
         });
         Map<String, Object> truckEntry = new HashMap<>();
-
-        maxIdRef.update("id", FieldValue.increment(1));
-
         truckEntry.put("location", gp);
         truckEntry.put("timestamp", t);
 
-        DocumentReference newTruckRef = db.collection("ice_cream_trucks").document();
+        db.collection("cities")
+                .add(truckEntry)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error adding document", e);
+                    }
+                });
 
-        newTruckRef.set(truckEntry);
+//        DocumentReference newTruckRef = db.collection("ice_cream_trucks").document();
+//
+//        newTruckRef.set(truckEntry);
+        maxIdRef.update("id", FieldValue.increment(1));
     }
 
     public void GetNearbyTrucks() {
