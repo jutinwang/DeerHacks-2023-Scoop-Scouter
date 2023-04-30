@@ -51,27 +51,29 @@ public class CloudStorage extends AppCompatActivity {
             }
         });
         Map<String, Object> truckEntry = new HashMap<>();
+        String fileName = "truck_" + Integer.toString(id[0]);
+        DocumentReference newTruckRef = db.collection("ice_cream_trucks").document(fileName);
         truckEntry.put("location", gp);
         truckEntry.put("timestamp", t);
 
-        db.collection("ice_cream_trucks")
-                .add(truckEntry)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                    }
-                });
+//        db.collection("ice_cream_trucks")
+//                .add(truckEntry)
+//                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+//                    @Override
+//                    public void onSuccess(DocumentReference documentReference) {
+//                        Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
+//                    }
+//                })
+//                .addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        Log.w(TAG, "Error adding document", e);
+//                    }
+//                });
 
-//        DocumentReference newTruckRef = db.collection("ice_cream_trucks").document();
-//
-//        newTruckRef.set(truckEntry);
+
+
+        newTruckRef.set(truckEntry);
         maxIdRef.update("id", FieldValue.increment(1));
     }
 
