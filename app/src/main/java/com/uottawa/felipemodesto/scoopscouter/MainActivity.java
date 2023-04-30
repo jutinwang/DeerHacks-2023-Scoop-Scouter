@@ -1,5 +1,7 @@
 package com.uottawa.felipemodesto.scoopscouter;
 
+import static java.lang.Math.round;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +23,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -34,11 +37,13 @@ import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Looper;
 import android.os.storage.StorageManager;
@@ -46,6 +51,7 @@ import android.os.storage.StorageVolume;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -64,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Double[] locations = new Double[2];
 
     ImageButton takePicture;
+    Button findTrucks;
     private LocationRequest locationRequest;
 
     @Override
@@ -81,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         locationRequest.setInterval(5000);
         locationRequest.setFastestInterval(2000);
         takePicture = findViewById(R.id.reportSightingButton);
+        findTrucks = findViewById(R.id.truckInArea);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -107,21 +115,55 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //triggered to add contents to map
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
+        float[] results = new float[1];
 
+        // Set up a listener for camera idle events
+        googleMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+            @Override
+            public void onCameraIdle() {
+                // Check the current zoom level of the map
+                float zoomLevel = googleMap.getCameraPosition().zoom;
+                // Set the visibility of the button based on the zoom level
+                if (zoomLevel > 15) {
+                    findTrucks.setVisibility(View.GONE);
+                } else {
+                    findTrucks.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        //current markers
         LatLng myLocation = new LatLng(getLat(), getLon());
-        LatLng sydney = new LatLng(-33.852, 151.211);
-        googleMap.addMarker(new MarkerOptions()
-                        .position(sydney)
-                        .title("Marker in Sydney")
-                        .snippet("Population: 4,137,400")
+        LatLng schoolParkingLot = new LatLng(43.553434, -79.679756);
+
+        //method for calculating distance
+        Location.distanceBetween(myLocation.latitude, myLocation.longitude,
+                schoolParkingLot.latitude, schoolParkingLot.longitude, results);
+
+        //placing the user marker
+        Marker userMarker = googleMap.addMarker(new MarkerOptions()
+                .position(myLocation)
+                .title("DEERHACKS 2023")
+                .snippet("Deerhack rules!")
+        );
+
+        //placing the marker for all avaliable trucks
+        Marker tester = googleMap.addMarker(new MarkerOptions()
+                        .position(schoolParkingLot)
+                        .title("Distance")
+                        .snippet("" + round(results[0]) + "m." + " " + (round(results[0]) * 100)/4800 + "min to walk")
                 //.icon(BitmapDescriptorFactory.fromResource(R.drawable.icecream_marker))
         );
-        googleMap.addMarker(new MarkerOptions()
-                        .position(myLocation)
-                        .title("Marker in Sydney")
-                        .snippet("Population: 4,137,400")
-        );
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 10));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 15));
+
+        new CountDownTimer(30000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+            }
+            public void onFinish() {
+                tester.remove();
+            }
+        }.start();
     }
 
     //basic camera function to test picture taking
