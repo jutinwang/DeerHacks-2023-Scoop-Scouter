@@ -24,14 +24,23 @@ public class CloudStorage extends AppCompatActivity {
         // Access a Cloud Firestore instance from your Activity
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+        DocumentReference docRef = db.collection("ice_cream_trucks").document("max_truck_id");
+        docRef.get().addOnCompleteListener)(new OnCompleteListener<DocumentSnapshot>(
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    
+        }
+        ))
         Map<String, Object> truckEntry = new HashMap<>();
 
-        DocumentReference newTruckRef = db.collection("ice_cream_trucks").document();
 
         // TODO: get id # from max_truck_id and assign it to this name and increment it
 
+
         truckEntry.put("location", gp);
         truckEntry.put("timestamp", t);
+
+        DocumentReference newTruckRef = db.collection("ice_cream_trucks").document();
 
         newTruckRef.set(truckEntry);
     }
@@ -40,7 +49,7 @@ public class CloudStorage extends AppCompatActivity {
         // TODO: make up a formula
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference trucksRef = db.collection("ice_cream_trucks");
-        Query nearbyQuery = trucksRef
+        Query nearbyQuery = trucksRef.whereEqualTo("")
     }
 
     public void GetImage(int id, int imgNum) {

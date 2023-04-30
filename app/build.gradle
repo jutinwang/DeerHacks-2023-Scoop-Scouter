@@ -43,5 +43,5 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:17.0.1'
     implementation 'com.google.firebase:firebase-firestore:24.5.0'
     implementation 'com.google.firebase:firebase-core:21.1.1'
-
+    implementation 'com.koalap:geofirestore-android:1.2.2'
 }
