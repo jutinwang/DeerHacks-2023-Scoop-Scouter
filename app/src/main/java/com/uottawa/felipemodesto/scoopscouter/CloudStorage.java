@@ -73,6 +73,7 @@ public class CloudStorage extends AppCompatActivity {
     public void GetNearbyTrucks(GeoPoint curGP, int zoomLevel) {
         // TODO: make up a formula
         final String TAG = "DocSnippets";
+        Log.d(TAG, "beginning");
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference trucksRef = db.collection("ice_cream_trucks");
         //Query nearbyQuery = trucksRef.whereEqualTo("")
@@ -106,7 +107,7 @@ public class CloudStorage extends AppCompatActivity {
                     .orderBy("geohash")
                     .startAt(b.startHash)
                     .endAt(b.endHash);
-
+            Log.d(TAG, "bound iteration");
             tasks.add(q.get());
         }
         List<GeoPoint> markerPoints = new ArrayList<>();
@@ -123,6 +124,7 @@ public class CloudStorage extends AppCompatActivity {
 //                                double lat = doc.getDouble("lat");
 //                                double lng = doc.getDouble("lng");
                                 GeoPoint gp = doc.getGeoPoint("location");
+                                Log.d(TAG, "succers");
 
                                 // We have to filter out a few false positives due to GeoHash
                                 // accuracy, but most will match

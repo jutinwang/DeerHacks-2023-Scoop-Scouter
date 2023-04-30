@@ -62,6 +62,8 @@ import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import org.checkerframework.checker.units.qual.C;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -137,6 +139,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v) {
                 openCamera();
+            }
+        });
+
+        findTrucks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.e("Iam the button", "here");
+                CloudStorage cloud = new CloudStorage();
+                float zoomLevel = myGoogle.getCameraPosition().zoom;
+                GeoPoint currentLocation = new GeoPoint(getLat(),getLon());
+                cloud.GetNearbyTrucks(currentLocation, round(zoomLevel));
             }
         });
 
