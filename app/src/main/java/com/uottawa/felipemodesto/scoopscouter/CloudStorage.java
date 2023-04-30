@@ -58,7 +58,7 @@ public class CloudStorage extends AppCompatActivity {
                     String fileName = "truck_" + Integer.toString(id);
                     DocumentReference newTruckRef = db.collection("ice_cream_trucks").document(fileName);
                     truckEntry.put("location", gp);
-                    String hash = GeoFireUtils.getGeoHashForLocation(new GeoLocation(gp.getLatitude(), gp.getLongitude()), 15);
+                    String hash = GeoFireUtils.getGeoHashForLocation(new GeoLocation(gp.getLatitude(), gp.getLongitude()), 21);
                     truckEntry.put("geohash", hash);
                     truckEntry.put("timestamp", t);
                     newTruckRef.set(truckEntry);
