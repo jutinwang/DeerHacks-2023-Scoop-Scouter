@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">ScoopScouter</string>
     <string name="findTruck">Single Trucks In My Area</string>
+    <string name="placeMarkerName">Place a Marker!</string>
 </resources>
