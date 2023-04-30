@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v) {
                 CloudStorage cloud = new CloudStorage();
-                GeoPoint currentLocation = new GeoPoint(getLat(),getLon());
+                GeoPoint currentLocation = new GeoPoint(getLat(), getLon());
                 Date d = new Date();
                 Timestamp currentTime = new Timestamp(d);
 
