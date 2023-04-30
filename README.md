@@ -9,3 +9,5 @@
 
 ## Technologies Used:
 #### Java, Python, Android Studio, OpenCV, Firebase, Google Cloud
+
+![Logo](https://github.com/jutinwang/DeerHacks-2023-Scoop-Scouter/blob/master/images/Scoop_scouter_logo.png)

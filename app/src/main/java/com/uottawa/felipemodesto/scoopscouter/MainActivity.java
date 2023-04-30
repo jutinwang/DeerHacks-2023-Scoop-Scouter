@@ -179,7 +179,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .position(myLocation)
                 .title("You're Here Now!")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-        myGoogle.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 10));
+        myGoogle.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 15));
+        setLat(myLocation.latitude);
+        setLon(myLocation.longitude);
         Log.e("Search Bar Message", "" + query);
     }
 
