@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 // Check the current zoom level of the map
                 float zoomLevel = googleMap.getCameraPosition().zoom;
                 // Set the visibility of the button based on the zoom level
-                if (zoomLevel > 15) {
+                if (zoomLevel < 15 || zoomLevel > 60) {
                     findTrucks.setVisibility(View.GONE);
                 } else {
                     findTrucks.setVisibility(View.VISIBLE);
