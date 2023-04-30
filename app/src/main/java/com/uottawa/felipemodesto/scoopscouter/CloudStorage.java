@@ -6,9 +6,14 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.firebase.geofire.GeoFireUtils;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQueryBounds;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -22,6 +27,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -51,6 +58,8 @@ public class CloudStorage extends AppCompatActivity {
                     String fileName = "truck_" + Integer.toString(id);
                     DocumentReference newTruckRef = db.collection("ice_cream_trucks").document(fileName);
                     truckEntry.put("location", gp);
+                    String hash = GeoFireUtils.getGeoHashForLocation(new GeoLocation(gp.getLatitude(), gp.getLongitude()));
+                    truckEntry.put("geohash", hash);
                     truckEntry.put("timestamp", t);
                     newTruckRef.set(truckEntry);
                     maxIdRef.update("id", FieldValue.increment(1));
@@ -61,13 +70,14 @@ public class CloudStorage extends AppCompatActivity {
         });
     }
 
-    public void GetNearbyTrucks() {
+    public void GetNearbyTrucks(GeoPoint curGP, int zoomLevel) {
         // TODO: make up a formula
+        final String TAG = "DocSnippets";
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference trucksRef = db.collection("ice_cream_trucks");
         //Query nearbyQuery = trucksRef.whereEqualTo("")
 //        trucksRef
-//                .whereEqualTo("capital", true)
+//                .whereGreaterThan("lat", curGP.getLatitude() - 5)
 //                .get()
 //                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
 //                    @Override
@@ -81,6 +91,56 @@ public class CloudStorage extends AppCompatActivity {
 //                        }
 //                    }
 //                });
+        // Find cities within 50km of London
+        final GeoLocation center = new GeoLocation(curGP.getLatitude(), curGP.getLongitude());
+        double zoomMultiplier = 1 / zoomLevel * 50;
+        final double radiusInM = 1000; // CONSTANT FOR NOW
+
+        // Each item in 'bounds' represents a startAt/endAt pair. We have to issue
+        // a separate query for each pair. There can be up to 9 pairs of bounds
+        // depending on overlap, but in most cases there are 4.
+        List<GeoQueryBounds> bounds = GeoFireUtils.getGeoHashQueryBounds(center, radiusInM);
+        final List<Task<QuerySnapshot>> tasks = new ArrayList<>();
+        for (GeoQueryBounds b : bounds) {
+            Query q = db.collection("cities")
+                    .orderBy("geohash")
+                    .startAt(b.startHash)
+                    .endAt(b.endHash);
+
+            tasks.add(q.get());
+        }
+        List<GeoPoint> markerPoints = new ArrayList<>();
+        // Collect all the query results together into a single list
+        Tasks.whenAllComplete(tasks)
+                .addOnCompleteListener(new OnCompleteListener<List<Task<?>>>() {
+                    @Override
+                    public void onComplete(@NonNull Task<List<Task<?>>> t) {
+                        List<DocumentSnapshot> matchingDocs = new ArrayList<>();
+
+                        for (Task<QuerySnapshot> task : tasks) {
+                            QuerySnapshot snap = task.getResult();
+                            for (DocumentSnapshot doc : snap.getDocuments()) {
+//                                double lat = doc.getDouble("lat");
+//                                double lng = doc.getDouble("lng");
+                                GeoPoint gp = doc.getGeoPoint("location");
+
+                                // We have to filter out a few false positives due to GeoHash
+                                // accuracy, but most will match
+                                // GeoLocation docLocation = new GeoLocation(lat, lng);
+                                GeoLocation docLocation = new GeoLocation(gp.getLatitude(), gp.getLongitude());
+                                double distanceInM = GeoFireUtils.getDistanceBetween(docLocation, center);
+                                if (distanceInM <= radiusInM) {
+                                    matchingDocs.add(doc);
+                                    markerPoints.add(new GeoPoint(gp.getLatitude(), gp.getLongitude()));
+                                }
+                            }
+                        }
+                        // matchingDocs contains the results
+                        // ...
+                        ////// CALL DISPLAY ALL MARKERS ////// ( can adapt to accept List<DocumentSnapshot>)
+                    }
+                });
+
     }
 
     public void GetImage(int id, int imgNum) {

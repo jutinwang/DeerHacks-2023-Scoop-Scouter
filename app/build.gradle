@@ -45,4 +45,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore:24.5.0'
     implementation 'com.google.firebase:firebase-core:21.1.1'
     //implementation 'com.koalap:geofirestore-android:1.2.2'
+    implementation 'com.firebase:geofire-android-common:3.1.0'
+
 }
