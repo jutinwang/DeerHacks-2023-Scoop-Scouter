@@ -16,6 +16,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.Timestamp;
@@ -29,16 +30,17 @@ public class CloudStorage extends AppCompatActivity {
         // Access a Cloud Firestore instance from your Activity
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        DocumentReference docRef = db.collection("ice_cream_trucks").document("max_truck_id");
+        DocumentReference maxIdRef = db.collection("ice_cream_trucks").document("max_truck_id");
         final int[] id = {1};
         final String TAG = "DocSnippets";
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        maxIdRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        // get id # from max_truck_id and assign it to this name and increment it
                         id[0] = Integer.parseInt(document.get("id").toString());
                     } else {
                         Log.d(TAG, "No such document");
@@ -50,9 +52,7 @@ public class CloudStorage extends AppCompatActivity {
         });
         Map<String, Object> truckEntry = new HashMap<>();
 
-
-        // TODO: get id # from max_truck_id and assign it to this name and increment it
-
+        maxIdRef.update("id", FieldValue.increment(1));
 
         truckEntry.put("location", gp);
         truckEntry.put("timestamp", t);
