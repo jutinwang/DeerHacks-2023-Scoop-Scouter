@@ -1,6 +1,7 @@
 package com.uottawa.felipemodesto.scoopscouter;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,11 +9,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.Query;
@@ -25,12 +30,24 @@ public class CloudStorage extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         DocumentReference docRef = db.collection("ice_cream_trucks").document("max_truck_id");
-        docRef.get().addOnCompleteListener)(new OnCompleteListener<DocumentSnapshot>(
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    
-        }
-        ))
+        final int[] id = {1};
+        final String TAG = "DocSnippets";
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        id[0] = Integer.parseInt(document.get("id").toString());
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
         Map<String, Object> truckEntry = new HashMap<>();
 
 
@@ -49,7 +66,7 @@ public class CloudStorage extends AppCompatActivity {
         // TODO: make up a formula
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference trucksRef = db.collection("ice_cream_trucks");
-        Query nearbyQuery = trucksRef.whereEqualTo("")
+        //Query nearbyQuery = trucksRef.whereEqualTo("")
     }
 
     public void GetImage(int id, int imgNum) {
