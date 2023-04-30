@@ -30,51 +30,35 @@ public class CloudStorage extends AppCompatActivity {
         // Access a Cloud Firestore instance from your Activity
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        DocumentReference maxIdRef = db.collection("ice_cream_trucks").document("max_truck_id");
-        final int[] id = {1};
+        DocumentReference maxIdRef = db.collection("indices").document("max_truck_id");
         final String TAG = "DocSnippets";
         maxIdRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
+                    int id = 1;
                     if (document.exists()) {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         // get id # from max_truck_id and assign it to this name and increment it
-                        id[0] = Integer.parseInt(document.get("id").toString());
+                        id = Integer.parseInt(document.get("id").toString());
+                        Log.d(TAG, "Max ID: " + document.get("id").toString());
+                        Log.d(TAG, "New ID: " + id);
                     } else {
                         Log.d(TAG, "No such document");
                     }
+                    Map<String, Object> truckEntry = new HashMap<>();
+                    String fileName = "truck_" + Integer.toString(id);
+                    DocumentReference newTruckRef = db.collection("ice_cream_trucks").document(fileName);
+                    truckEntry.put("location", gp);
+                    truckEntry.put("timestamp", t);
+                    newTruckRef.set(truckEntry);
+                    maxIdRef.update("id", FieldValue.increment(1));
                 } else {
                     Log.d(TAG, "get failed with ", task.getException());
                 }
             }
         });
-        Map<String, Object> truckEntry = new HashMap<>();
-        String fileName = "truck_" + Integer.toString(id[0]);
-        DocumentReference newTruckRef = db.collection("ice_cream_trucks").document(fileName);
-        truckEntry.put("location", gp);
-        truckEntry.put("timestamp", t);
-
-//        db.collection("ice_cream_trucks")
-//                .add(truckEntry)
-//                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-//                    @Override
-//                    public void onSuccess(DocumentReference documentReference) {
-//                        Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        Log.w(TAG, "Error adding document", e);
-//                    }
-//                });
-
-
-
-        newTruckRef.set(truckEntry);
-        maxIdRef.update("id", FieldValue.increment(1));
     }
 
     public void GetNearbyTrucks() {
@@ -82,6 +66,21 @@ public class CloudStorage extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference trucksRef = db.collection("ice_cream_trucks");
         //Query nearbyQuery = trucksRef.whereEqualTo("")
+//        trucksRef
+//                .whereEqualTo("capital", true)
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            for (QueryDocumentSnapshot document : task.getResult()) {
+//                                Log.d(TAG, document.getId() + " => " + document.getData());
+//                            }
+//                        } else {
+//                            Log.d(TAG, "Error getting documents: ", task.getException());
+//                        }
+//                    }
+//                });
     }
 
     public void GetImage(int id, int imgNum) {
