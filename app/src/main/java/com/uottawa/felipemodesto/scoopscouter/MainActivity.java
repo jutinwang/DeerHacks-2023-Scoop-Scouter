@@ -161,8 +161,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 GeoPoint currentLocation = new GeoPoint(getLat(), getLon());
                 Date d = new Date();
                 Timestamp currentTime = new Timestamp(d);
-
                 cloud.AddData(currentTime,currentLocation);
+                float zoomLevel = myGoogle.getCameraPosition().zoom;
+                cloud.GetNearbyTrucks(currentLocation, round(zoomLevel));
             }
         });
     }
